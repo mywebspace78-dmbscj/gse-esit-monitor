@@ -1,4 +1,1 @@
-# ads.txt for GSE Exit Monitor
-# After AdSense approves your site, replace the line below with the exact line
-# shown in your AdSense account (Sites > ads.txt), then delete these comments.
-# It looks like: google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
+google.com, pub-8981314427661023, DIRECT, f08c47fec0942fa0
