@@ -1,3 +1,5 @@
+
+
 name: Nightly price update
 
 on:
@@ -8,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  actions: write   # lets this job start the Pages deploy after it pushes
 
 concurrency:
   group: nightly-prices
@@ -27,9 +30,18 @@ jobs:
           ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
         run: node scripts/update-prices.mjs
       - name: Commit and push if the page changed
+        id: commit
         run: |
           if git diff --quiet; then echo "No changes."; exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
           git commit -am "Nightly price update $(date -u +%Y-%m-%d)"
           git push
+          echo "changed=yes" >> "$GITHUB_OUTPUT"
+      - name: Redeploy the site
+        # A push made by this job does not start other workflows on its own,
+        # so start the "Deploy static content to Pages" workflow (static.yml) here.
+        if: steps.commit.outputs.changed == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run static.yml --ref main
